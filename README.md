@@ -46,11 +46,11 @@ sudo systemctl enable clickhouse-server
 
 Включим и выполним `ifconfig` *(если нам скажут, что нужно установить net-tools, то ставим)*, чтобы узнать адрес машины, будет что-то вроде:
 
-![](images/2.png)
+![](images/2.PNG)
 
 Проверим, что сервер работает: `service clickhouse-server status`
 
-![](images/4.png)
+![](images/4.PNG)
 
 Добавим правила в фаерволл:
 
