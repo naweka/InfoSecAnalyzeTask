@@ -74,9 +74,10 @@ sudo ufw allow 9000/tcp
 На хосте *(у меня windows 10)* ставим модуль для работы с CH  `pip install clickhouse-connect`.
 
 Далее выполним незамысловатый скрипт, чтобы убедиться, что все хорошо:
-```
+``` python
 import clickhouse_connect
 client = clickhouse_connect.get_client(host='192.168.91.128', username='default', password='a')
+print(client.query('SELECT version()').result_set)
 ```
 > Здесь `host` - это адрес машины, а `username` должен быть дефолтным, если новых мы не создавали *(а мы не создавали)*
 
