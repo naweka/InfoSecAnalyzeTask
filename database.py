@@ -54,6 +54,8 @@ class DataBase:
         counter = 0
         data_to_insert = []
 
+        # Проходимся по всем строкам df, складываем в "буфер", а
+        # потом отправляем данные на вставку
         for index, row in dataframe.iterrows():
             counter += 1
             data_to_insert.append([row[x] for x in column_names])
@@ -62,7 +64,7 @@ class DataBase:
                 data_to_insert.clear()
                 counter = 0
 
+        # Если буфер не пуст, то его содержимое тоже надо вставить
         if len(data_to_insert) != 0:
             self.insert(table, data_to_insert, column_names=column_names)
-            data_to_insert.clear()
 
