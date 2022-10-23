@@ -32,7 +32,7 @@ class DataBase:
         self.check_if_client_is_connected()
         return self.client.query(command)
 
-    def insert(self, table: str, data: list, column_names: list) -> None:
+    def insert(self, table: str, data: list[list], column_names: list[str]) -> None:
         """
         Метод для вставки значений в таблицу
         :param table: имя таблицы, в которую необходимо вставить значения
@@ -42,7 +42,7 @@ class DataBase:
         self.check_if_client_is_connected()
         self.client.insert(table, data, column_names=column_names)
 
-    def insert_dataframe(self, table: str, dataframe: pandas.DataFrame, chunk_size: int, column_names: list) -> None:
+    def insert_dataframe(self, table: str, dataframe: pandas.DataFrame, chunk_size: int, column_names: list[str]) -> None:
         """
         Метод для переноса значений в бд из DataFrame
         :param table: имя таблицы, в которую необходимо вставить значения

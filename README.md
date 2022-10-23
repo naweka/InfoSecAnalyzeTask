@@ -59,7 +59,7 @@ sudo systemctl enable clickhouse-server
 
 Добавим правила в фаерволл:
 
-```
+``` 
 sudo ufw enable
 sudo ufw allow 8123
 sudo ufw allow 8123/tcp
