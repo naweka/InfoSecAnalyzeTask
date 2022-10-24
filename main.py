@@ -1,43 +1,37 @@
 import datetime
-from numpy import insert, intp
-from database import DataBase
+from typing import NoReturn
+from clickhouse_db.clickhouse_client import ClickHouseClient
+from clickhouse_db.history_repository import HistoryRepository
+from clickhouse_db.users_repository import UsersRepository
 import pandas as pd
 
 
-def kontur_task_init_database(db: DataBase) -> None:
-    """
-    Метод для создания базы данных и внесения начальных данных
-    """
-    # создаем бд и таблицы
+def init_database_structure(db: ClickHouseClient) -> NoReturn:
     db.exec_command('CREATE DATABASE kontur_db')
     db.exec_command(
         'CREATE TABLE kontur_db.users (GUID String, FirstName String, MiddleName String, LastName String) ENGINE MergeTree PRIMARY KEY GUID')
     db.exec_command(
         'CREATE TABLE kontur_db.history (GUID String, Timestamp DateTime, OuterIP String, NgToken String, OpenVPNServer String, InnerIP String) ENGINE MergeTree PRIMARY KEY GUID')
 
+
+def fill_database(db: ClickHouseClient) -> NoReturn:
+    """Метод для создания базы данных и внесения начальных данных."""
+
     # Читаем содержимое файлов, помечаем пустые
     # значения, а также парсим дату/время
-    df = pd.read_csv('logins_ansi.csv', sep=',', delimiter=None)
-    df['Timestamp'] = df['Timestamp'].apply(lambda x: datetime.datetime.fromisoformat(x))
-    df.fillna('NULL', inplace=True)
+    df_history = pd.read_csv('logins_ansi.csv', sep=',', delimiter=None)
+    df_history['Timestamp'] = df_history['Timestamp'].apply(
+        lambda x: datetime.datetime.fromisoformat(x))
+    df_history.fillna('NULL', inplace=True)
 
-    df_names = pd.read_json('user_info_beauty.json')
-    df_names.fillna('NULL', inplace=True)
+    df_users = pd.read_json('user_info_beauty.json')
+    df_users.fillna('NULL', inplace=True)
 
-    # Вставляем значения
-    db.insert_dataframe('kontur_db.users', df_names, 100000, ['GUID',
-                                                              'FirstName',
-                                                              'MiddleName',
-                                                              'LastName'])
-
-    db.insert_dataframe('kontur_db.history', df, 100000, ['GUID',
-                                                          'Timestamp',
-                                                          'OuterIP',
-                                                          'NgToken',
-                                                          'OpenVPNServer',
-                                                          'InnerIP'])
+    HistoryRepository().insert_dataframe(df_history)
+    UsersRepository().insert_dataframe(df_users)
 
 
 # Подключаемся к бд, инициализируем значения
-db = DataBase('192.168.91.128', password='a')
-kontur_task_init_database(db)
+db = ClickHouseClient()
+init_database_structure(db)
+fill_database(db)
