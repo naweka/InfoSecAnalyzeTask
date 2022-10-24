@@ -1,12 +1,10 @@
-from typing import NoReturn
+from typing import NoReturn, Any, Union
 
 import clickhouse_connect
 import pandas
 from clickhouse_connect.driver.query import QueryResult
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+from constants import DATABASE_ADDRESS, DATABASE_USER, DATABASE_PASSWORD
 
 
 class ClickHouseClient:
@@ -17,22 +15,27 @@ class ClickHouseClient:
 
     def __init__(self):
         self.client = clickhouse_connect.get_client(
-            host=os.getenv('DATABASE_ADDRESS'),
-            username=os.getenv('DATABASE_USER'),
-            password=os.getenv('DATABASE_PASSWORD')
+            host= DATABASE_ADDRESS,
+            username=DATABASE_USER,
+            password=DATABASE_PASSWORD
         )
         if not self.client:
             raise ConnectionError('No connection to database')
 
-    def exec_command(self, command: str) -> None:
+    def exec_command(self, command: str) -> Union[str, int, list[str]]:
         """Метод для выполнения команд без возвращения результата."""
-        self.client.command(command)
+        return self.client.command(command)
 
     def exec_query(self, command: str) -> QueryResult:
         """Метод для выполнения команд с возвращением результата."""
         return self.client.query(command)
 
-    def insert(self, table: str, data: list[list], column_names: list[str]) -> None:
+    def insert(
+            self,
+            table: str,
+            data: list[list[Any]],
+            column_names: list[str]
+    ) -> None:
         """Метод для вставки значений в таблицу.
 
         * table: имя таблицы, в которую необходимо вставить значения.
