@@ -19,12 +19,12 @@ def fill_database(db: ClickHouseClient) -> NoReturn:
 
     # Читаем содержимое файлов, помечаем пустые
     # значения, а также парсим дату/время
-    df_history = pd.read_csv('logins_ansi.csv', sep=',', delimiter=None)
+    df_history = pd.read_csv('external_files/logins_ansi.csv', sep=',', delimiter=None)
     df_history['Timestamp'] = df_history['Timestamp'].apply(
         lambda x: datetime.datetime.fromisoformat(x))
     df_history.fillna('NULL', inplace=True)
 
-    df_users = pd.read_json('user_info_beauty.json')
+    df_users = pd.read_json('external_files/user_info_beauty.json')
     df_users.fillna('NULL', inplace=True)
 
     HistoryRepository().insert_dataframe(df_history)
